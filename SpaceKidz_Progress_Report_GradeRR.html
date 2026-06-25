@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SpaceKidz Progress Reports — Grade RR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --purple:#7B3FA0;
+    --cyan:#3FBFCF;
+    --green:#7CB342;
+    --gold:#F5A623;
+    --pink:#E85D9C;
+    --ink:#2B2530;
+    --paper:#FFFBF5;
+    --card:#FFFFFF;
+    --line:#E8DFD2;
+    --muted:#8A7F8D;
+    --r1:#E8536B;
+    --r2:#F5A623;
+    --r3:#9CC25A;
+    --r4:#7CB342;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{ display:flex; min-height:100vh; }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:280px;
+    flex-shrink:0;
+    background:var(--card);
+    border-right:1px solid var(--line);
+    padding:20px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; padding:4px 4px 12px; border-bottom:2px dashed var(--line); }
+  .brand svg{ width:42px; height:42px; flex-shrink:0; }
+  .brand-text{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:19px; line-height:1; letter-spacing:0.5px; }
+  .brand-text .s1{color:var(--purple)} .brand-text .s2{color:var(--cyan)} .brand-text .s3{color:var(--green)} .brand-text .s4{color:var(--gold)} .brand-text .s5{color:var(--pink)}
+  .brand-sub{ font-size:10px; color:var(--muted); font-weight:600; letter-spacing:0.3px; margin-top:2px;}
+  .age-tag{ display:inline-block; margin-top:8px; background:linear-gradient(135deg,var(--cyan),var(--purple)); color:white; font-family:'Baloo 2'; font-weight:700; font-size:12px; padding:4px 10px; border-radius:20px; }
+
+  .roster-head{ display:flex; align-items:center; justify-content:space-between; margin-top:4px;}
+  .roster-head h3{ font-family:'Baloo 2'; font-size:13px; text-transform:uppercase; letter-spacing:0.6px; color:var(--muted); margin:0; }
+  .btn-add{ width:26px;height:26px;border-radius:8px;border:none;background:var(--purple);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center; line-height:1;}
+  .btn-add:hover{background:#622f80;}
+
+  .roster{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
+  .child-card{
+    border:1px solid var(--line); border-radius:12px; padding:10px 12px; cursor:pointer; background:#fff;
+    transition:all .15s; position:relative;
+  }
+  .child-card:hover{ border-color:var(--cyan); }
+  .child-card.active{ border-color:var(--purple); background:#F8F1FB; box-shadow:0 2px 0 var(--purple) inset; }
+  .child-name{ font-weight:700; font-size:13.5px; }
+  .child-meta{ font-size:11px; color:var(--muted); margin-top:2px; }
+  .child-progress{ display:flex; gap:3px; margin-top:7px; }
+  .dot{ height:5px; flex:1; border-radius:3px; background:var(--line); }
+  .dot.done{ background:var(--green); }
+  .dot.partial{ background:var(--gold); }
+  .empty-roster{ text-align:center; color:var(--muted); font-size:12.5px; padding:30px 10px; }
+
+  .sidebar-foot{ font-size:10.5px; color:var(--muted); text-align:center; padding-top:8px; border-top:1px solid var(--line); }
+  .backup-row{ display:flex; gap:6px; }
+  .btn-tiny{
+    flex:1; font-size:10.5px; font-weight:600; padding:7px 4px; border-radius:8px; border:1px solid var(--line);
+    background:#fff; color:var(--muted); cursor:pointer; font-family:'Inter';
+  }
+  .btn-tiny:hover{ border-color:var(--purple); color:var(--purple); }
+
+  /* ---------- MAIN ---------- */
+  .main{ flex:1; padding:24px 32px 60px; max-width:980px; }
+  .topbar{ display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:18px; flex-wrap:wrap;}
+  .child-title{ font-family:'Baloo 2'; font-weight:700; font-size:26px; }
+  .child-sub{ color:var(--muted); font-size:13px; margin-top:2px; }
+  .field-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+  .field-row input{
+    border:1px solid var(--line); border-radius:8px; padding:7px 10px; font-family:'Inter'; font-size:12.5px; background:#fff;
+  }
+  .field-row label{ font-size:10.5px; color:var(--muted); display:block; margin-bottom:3px; font-weight:600;}
+  .field-group{ display:flex; flex-direction:column; }
+
+  .actions{ display:flex; gap:8px; flex-shrink:0; }
+  .btn{
+    font-family:'Inter'; font-weight:600; font-size:13px; border-radius:10px; padding:9px 16px; cursor:pointer; border:none;
+    display:flex; align-items:center; gap:6px; transition:transform .1s;
+  }
+  .btn:active{ transform:scale(0.97); }
+  .btn-primary{ background:var(--purple); color:white; }
+  .btn-primary:hover{ background:#622f80; }
+  .btn-ghost{ background:#fff; border:1px solid var(--line); color:var(--ink); }
+  .btn-ghost:hover{ border-color:var(--purple); }
+  .btn-danger{ background:#fff; border:1px solid #F0CFD6; color:var(--r1); }
+
+  .term-tabs{ display:flex; gap:6px; margin-bottom:18px; background:var(--card); padding:5px; border-radius:14px; border:1px solid var(--line); width:fit-content;}
+  .term-tab{
+    font-family:'Baloo 2'; font-weight:600; font-size:13.5px; padding:8px 18px; border-radius:10px; cursor:pointer; color:var(--muted);
+    position:relative;
+  }
+  .term-tab.active{ background:var(--purple); color:white; }
+  .term-tab .badge{ position:absolute; top:-4px; right:-4px; width:8px; height:8px; border-radius:50%; background:var(--green); border:1.5px solid white;}
+
+  .legend{ display:flex; gap:14px; margin-bottom:14px; flex-wrap:wrap; }
+  .legend span{ font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:5px; }
+  .legend .lk{ width:10px;height:10px;border-radius:50%; display:inline-block;}
+
+  .category{ margin-bottom:22px; background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+  .cat-head{ padding:13px 18px; font-family:'Baloo 2'; font-weight:700; font-size:15px; color:white; display:flex; align-items:center; gap:8px;}
+  .cat-head svg{ width:18px;height:18px; flex-shrink:0;}
+  .row{ display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-top:1px solid var(--line); gap:16px; }
+  .row:hover{ background:#FFFAF2; }
+  .row-label{ font-size:13.5px; line-height:1.35; flex:1; }
+  .rating{ display:flex; gap:6px; flex-shrink:0; }
+  .rating button{
+    width:34px; height:34px; border-radius:10px; border:1.5px solid var(--line); background:#fff; cursor:pointer;
+    font-family:'Baloo 2'; font-weight:700; font-size:13px; color:var(--muted); transition:all .12s;
+  }
+  .rating button:hover{ border-color:var(--cyan); }
+  .rating button.sel-1{ background:var(--r1); border-color:var(--r1); color:white; }
+  .rating button.sel-2{ background:var(--r2); border-color:var(--r2); color:white; }
+  .rating button.sel-3{ background:var(--r3); border-color:var(--r3); color:white; }
+  .rating button.sel-4{ background:var(--r4); border-color:var(--r4); color:white; }
+
+  .notes-section{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:18px; }
+  .notes-section h4{ font-family:'Baloo 2'; margin:0 0 10px; font-size:15px; }
+  .notes-section textarea{
+    width:100%; min-height:80px; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-family:'Inter';
+    font-size:13px; resize:vertical;
+  }
+  .sign-row{ display:flex; gap:24px; margin-top:14px; flex-wrap:wrap; }
+  .sign-field{ flex:1; min-width:200px; }
+  .sign-field label{ font-size:11px; color:var(--muted); font-weight:600; display:block; margin-bottom:4px;}
+  .sign-field input{ width:100%; border:none; border-bottom:1.5px solid var(--line); padding:6px 2px; font-family:'Inter'; font-size:14px; background:transparent;}
+  .sign-field input:focus{ outline:none; border-color:var(--purple); }
+
+  .save-toast{
+    position:fixed; bottom:24px; right:24px; background:var(--ink); color:white; padding:10px 18px; border-radius:10px;
+    font-size:13px; font-weight:600; opacity:0; transform:translateY(10px); transition:all .25s; pointer-events:none;
+    display:flex; align-items:center; gap:8px;
+  }
+  .save-toast.show{ opacity:1; transform:translateY(0); }
+
+  .empty-main{ display:flex; flex-direction:column; align-items:center; justify-content:center; height:70vh; color:var(--muted); text-align:center; gap:14px;}
+  .empty-main svg{ width:90px; height:90px; opacity:0.5;}
+  .empty-main h2{ font-family:'Baloo 2'; color:var(--ink); margin:0; }
+
+  /* PDF export view (hidden, off-screen) */
+  #pdf-root{ position:fixed; top:0; left:-9999px; width:780px; background:#fff; }
+  .pdf-page{ width:780px; padding:40px 44px; background:#fff; position:relative; }
+  .pdf-border{ position:absolute; inset:14px; border:3px solid var(--purple); border-radius:18px; pointer-events:none; opacity:0.25;}
+  .pdf-header{ display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+  .pdf-header svg{ width:54px; height:54px; }
+  .pdf-wordmark{ font-family:'Baloo 2'; font-weight:800; font-size:28px; }
+  .pdf-tagline{ font-family:'Baloo 2'; color:var(--cyan); font-size:11px; letter-spacing:1px; margin-top:1px;}
+  .pdf-infobox{ border:2px solid #999; border-radius:14px; padding:14px 18px; margin:14px 0 18px; font-size:13px; line-height:1.9; }
+  .pdf-infobox b{ display:inline-block; width:120px; }
+  .pdf-title{ font-family:'Baloo 2'; font-weight:700; font-size:22px; text-align:center; margin:6px 0 2px; }
+  .pdf-tagline2{ text-align:center; color:var(--cyan); font-family:'Baloo 2'; font-size:13px; margin-bottom:4px;}
+  .pdf-term{ text-align:center; font-family:'Baloo 2'; font-size:16px; background:#F1E6F6; color:var(--purple); border-radius:10px; padding:6px; margin:14px 0; }
+  .pdf-cat{ font-family:'Baloo 2'; font-weight:700; font-size:13.5px; color:white; padding:8px 14px; border-radius:8px 8px 0 0; margin-top:14px;}
+  .pdf-table{ width:100%; border-collapse:collapse; font-size:11.5px; }
+  .pdf-table td{ border:1px solid #ddd; padding:7px 10px; }
+  .pdf-table .lbl{ width:70%; }
+  .pdf-table .val{ text-align:center; font-weight:700; width:10%; }
+  .pdf-notes{ margin-top:16px; border:1px solid #ddd; border-radius:10px; padding:12px 14px; font-size:12px; }
+  .pdf-notes b{ font-family:'Baloo 2'; }
+  .pdf-sign{ display:flex; justify-content:space-between; margin-top:18px; font-size:11.5px; }
+  .pdf-sign div{ width:46%; border-top:1px solid #999; padding-top:4px; }
+  .pdf-foot{ text-align:center; font-size:9.5px; color:#aaa; margin-top:20px; }
+</style>
+</head>
+<body>
+
+<div id="app" class="app"></div>
+
+<div class="save-toast" id="toast">✓ Saved</div>
+
+<!-- hidden PDF render target -->
+<div id="pdf-root"></div>
+
+<script>
+/* ===================== DATA MODEL ===================== */
+const CATEGORIES = [
+  { name:"Physical Development", color:"#E85D9C", items:[
+    "General Health","Endurance","Energy Level","Body Posture","Appetite"
+  ]},
+  { name:"Gross Motor Development", color:"#3FBFCF", items:[
+    "Coordination","Balance","Jumping","Agility","Use of climbing apparatus",
+    "Handling of ball","Step and Catch","Hopscotch","Midline Crossing"
+  ]},
+  { name:"Fine Motor Development", color:"#7CB342", items:[
+    "Handling of pencil / crayon","Colouring In","Drawing","Handling of scissors","Cutting",
+    "Man drawing","Dominance: Hand / Foot / Eye"
+  ]},
+  { name:"Visual Perception Development", color:"#F5A623", items:[
+    "Colour Recognition: Primary / Secondary","Knowledge of body parts","Foreground and Background",
+    "Visual Discrimination: Shape Recognition / Consistency","Categorising",
+    "Visual Analysis and Synthesis: Puzzles (pieces)","Spatial Orientation (above, under etc.)"
+  ]},
+  { name:"Auditory Perception Development", color:"#7B3FA0", items:[
+    "Discrimination: Identifying of common sounds and noises","Discrimination: Ability to listen and concentrate in a group",
+    "Memory: Executing Instructions","Memory: Memorising of songs and rhymes"
+  ]},
+  { name:"Language Development", color:"#3FBFCF", items:[
+    "Pronunciation of words / sounds","Vocabulary","Sentence build","Expression",
+    "Conversation with peers","Conversation with teacher"
+  ]},
+  { name:"Mathematical Comprehension", color:"#F5A623", items:[
+    "Count to (number)","Count objects (up to 10)","Number Concept (\u201csums\u201d to 5)",
+    "Recognition of numbers (1-5)","Mathematical vocabulary (short, long, more, less)"
+  ]},
+  { name:"Cognitive Development", color:"#7B3FA0", items:[
+    "I know my: name, surname, age, address, tel nr","Time Concept","Inquisitiveness",
+    "Reasoning","Concentration and attention span"
+  ]},
+  { name:"Art and Culture", color:"#E85D9C", items:[
+    "Art Activities: Participation","Art Activities: Creative Ability",
+    "Music Activities: Participation","Music Activities: Rhythm"
+  ]},
+  { name:"Emotional and Social Development", color:"#3FBFCF", items:[
+    "Self Confidence","Independence","Self-Control",
+    "Relationship with peers: Able to share","Relationship with peers: Able to wait turn",
+    "Relationship with peers: Works and plays easily with peers","Relationship with peers: Shows empathy towards others",
+    "Relationship with peers: Has leadership qualities","Relationship with teacher: Spontaneous and outspoken",
+    "Relationship with teacher: Wants to please","Relationship with teacher: Accepts adult authority",
+    "Relationship with teacher: Obedient"
+  ]},
+];
+const SCALE = [1,2,3,4];
+const SCALE_LABELS = {1:"Not Achieved",2:"Partial Achievement",3:"Satisfactory Achievement",4:"Outstanding/Excellent Achievement"};
+const TERMS = ["Term 1","Term 2","Term 3","Term 4"];
+const AGE_LABEL = "Grade RR";
+const STORAGE_PREFIX = "spacekidz-grade-rr";
+
+let state = { children: {}, activeChildId: null, activeTerm: 0 };
+
+/* ===================== STORAGE ===================== */
+// Uses browser localStorage so this file works standalone (double-click to open,
+// host on any server, or save to desktop) without needing the Claude.ai environment.
+async function loadAll(){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + ":roster");
+    if(raw){ state.children = JSON.parse(raw); }
+  }catch(e){ state.children = {}; }
+}
+async function saveRoster(){
+  try{ localStorage.setItem(STORAGE_PREFIX + ":roster", JSON.stringify(state.children)); }
+  catch(e){ console.error("save failed", e); alert("Could not save — your browser storage may be full or disabled."); }
+  flashToast();
+}
+function flashToast(){
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 1400);
+}
+
+function newChild(name){
+  const id = 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  const terms = TERMS.map(()=>({}));
+  return { id, name, dob:"", educator:"", className:"", year:new Date().getFullYear().toString(),
+    terms, notes:["","","",""], signedEducator:["","","",""], signedParent:["","","",""] };
+}
+
+function totalFields(){ return CATEGORIES.reduce((s,c)=>s+c.items.length,0); }
+function filledCount(termData){ return Object.keys(termData||{}).length; }
+
+/* ===================== RENDER ===================== */
+function svgRocket(idSuffix=""){
+  return `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M32 4C32 4 46 14 46 34C46 40 44 46 44 46L20 46C20 46 18 40 18 34C18 14 32 4 32 4Z" stroke="#3FBFCF" stroke-width="2.5"/>
+    <circle cx="32" cy="24" r="7" stroke="#F5A623" stroke-width="2.5" fill="#fff"/>
+    <circle cx="32" cy="24" r="3" fill="#3FBFCF"/>
+    <path d="M18 34L8 44L18 42Z" fill="#3FBFCF" stroke="#3FBFCF" stroke-width="1.5"/>
+    <path d="M46 34L56 44L46 42Z" fill="#3FBFCF" stroke="#3FBFCF" stroke-width="1.5"/>
+    <path d="M24 46C24 46 26 56 32 60C38 56 40 46 40 46" fill="#F5A623" opacity="0.85"/>
+  </svg>`;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  const childArr = Object.values(state.children).sort((a,b)=>a.name.localeCompare(b.name));
+  const active = state.activeChildId ? state.children[state.activeChildId] : null;
+
+  app.innerHTML = `
+    <div class="sidebar">
+      <div class="brand">
+        ${svgRocket()}
+        <div>
+          <div class="brand-text"><span class="s1">S</span><span class="s2">P</span><span class="s3">A</span><span class="s4">C</span><span class="s5">E</span><span class="s1">K</span><span class="s2">I</span><span class="s3">D</span><span class="s4">Z</span></div>
+          <div class="brand-sub">SELECTIVE PLAY AND CHILD EDUCATION</div>
+          <div class="age-tag">${AGE_LABEL}</div>
+        </div>
+      </div>
+      <div class="roster-head">
+        <h3>Children (${childArr.length})</h3>
+        <button class="btn-add" id="btnAddChild" title="Add child">+</button>
+      </div>
+      <div class="roster" id="roster">
+        ${childArr.length === 0 ? `<div class="empty-roster">No children yet.<br>Click + to add your first learner.</div>` :
+          childArr.map(c => {
+            const filled = c.terms.map(t => filledCount(t));
+            const total = totalFields();
+            return `
+            <div class="child-card ${c.id===state.activeChildId?'active':''}" data-id="${c.id}">
+              <div class="child-name">${escapeHtml(c.name)||'(unnamed)'}</div>
+              <div class="child-meta">${c.className?escapeHtml(c.className):'No class set'}</div>
+              <div class="child-progress">
+                ${filled.map(f => `<div class="dot ${f>=total?'done':(f>0?'partial':'')}"></div>`).join('')}
+              </div>
+            </div>`;
+          }).join('')
+        }
+      </div>
+      <div class="backup-row">
+        <button class="btn-tiny" id="btnBackupExport">⬇ Backup data</button>
+        <button class="btn-tiny" id="btnBackupImport">⬆ Restore data</button>
+        <input type="file" id="fileImport" accept=".json" style="display:none">
+      </div>
+      <div class="sidebar-foot">Cathkin Academy &amp; SpaceKidz<br>Ravenswood, Boksburg</div>
+    </div>
+
+    <div class="main">
+      ${!active ? `
+        <div class="empty-main">
+          ${svgRocket()}
+          <h2>Select or add a child to begin</h2>
+          <p>Each learner's progress is tracked across all 4 terms.</p>
+        </div>
+      ` : renderMain(active)}
+    </div>
+  `;
+
+  attachEvents();
+}
+
+function renderMain(c){
+  const termIdx = state.activeTerm;
+  const termData = c.terms[termIdx] || {};
+
+  return `
+    <div class="topbar">
+      <div>
+        <div class="child-title">${escapeHtml(c.name)||'Unnamed Learner'}</div>
+        <div class="child-sub">Progress Report &middot; ${AGE_LABEL}</div>
+        <div class="field-row">
+          <div class="field-group"><label>Date of Birth</label><input type="date" data-field="dob" value="${c.dob}"></div>
+          <div class="field-group"><label>Educator</label><input type="text" data-field="educator" placeholder="Educator name" value="${escapeAttr(c.educator)}"></div>
+          <div class="field-group"><label>Class</label><input type="text" data-field="className" placeholder="e.g. Little Stars" value="${escapeAttr(c.className)}"></div>
+          <div class="field-group"><label>Year</label><input type="text" data-field="year" style="width:70px" value="${escapeAttr(c.year)}"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="btnExport">⬇ Export PDF</button>
+        <button class="btn btn-danger" id="btnDelete">Remove</button>
+      </div>
+    </div>
+
+    <div class="term-tabs">
+      ${TERMS.map((t,i)=>{
+        const f = filledCount(c.terms[i]); const tot = totalFields();
+        return `<div class="term-tab ${i===termIdx?'active':''}" data-term="${i}">${t}${f>0&&f<tot?'<span class="badge" style="background:#F5A623"></span>':(f>=tot?'<span class="badge"></span>':'')}</div>`;
+      }).join('')}
+    </div>
+
+    <div class="legend">
+      ${SCALE.map(s => `<span><span class="lk" style="background:var(--r${s})"></span>${s} = ${SCALE_LABELS[s]}</span>`).join('')}
+    </div>
+
+    ${CATEGORIES.map((cat, ci) => `
+      <div class="category">
+        <div class="cat-head" style="background:${cat.color}">${cat.name}</div>
+        ${cat.items.map((item, ii) => {
+          const key = `${ci}_${ii}`;
+          const val = termData[key];
+          return `
+          <div class="row">
+            <div class="row-label">${item}</div>
+            <div class="rating" data-key="${key}">
+              ${SCALE.map(s => `<button class="${val===s?'sel-'+s:''}" data-score="${s}" title="${SCALE_LABELS[s]}">${s}</button>`).join('')}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    `).join('')}
+
+    <div class="notes-section">
+      <h4>General Observation from Educator — ${TERMS[termIdx]}</h4>
+      <textarea id="notesArea" placeholder="Write your observations for this term...">${escapeHtml(c.notes[termIdx]||'')}</textarea>
+      <div class="sign-row">
+        <div class="sign-field"><label>Signed: Educator</label><input type="text" id="signEducator" value="${escapeAttr(c.signedEducator[termIdx]||'')}" placeholder="Educator name"></div>
+        <div class="sign-field"><label>Signed: Parent</label><input type="text" id="signParent" value="${escapeAttr(c.signedParent[termIdx]||'')}" placeholder="Parent name"></div>
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
+
+/* ===================== EVENTS ===================== */
+function attachEvents(){
+  const addBtn = document.getElementById('btnAddChild');
+  if(addBtn) addBtn.onclick = async () => {
+    const name = prompt("Child's full name:");
+    if(!name) return;
+    const child = newChild(name.trim());
+    state.children[child.id] = child;
+    state.activeChildId = child.id;
+    state.activeTerm = 0;
+    await saveRoster();
+    render();
+  };
+
+  document.querySelectorAll('.child-card').forEach(el => {
+    el.onclick = () => { state.activeChildId = el.dataset.id; state.activeTerm = 0; render(); };
+  });
+
+  document.querySelectorAll('.term-tab').forEach(el => {
+    el.onclick = () => { state.activeTerm = parseInt(el.dataset.term); render(); };
+  });
+
+  document.querySelectorAll('.rating').forEach(el => {
+    el.querySelectorAll('button').forEach(btn => {
+      btn.onclick = async () => {
+        const c = state.children[state.activeChildId];
+        const key = el.dataset.key;
+        const score = parseInt(btn.dataset.score);
+        const termData = c.terms[state.activeTerm] || {};
+        termData[key] = (termData[key] === score) ? undefined : score;
+        if(termData[key] === undefined) delete termData[key];
+        c.terms[state.activeTerm] = termData;
+        await saveRoster();
+        render();
+      };
+    });
+  });
+
+  document.querySelectorAll('[data-field]').forEach(el => {
+    el.onchange = async () => {
+      const c = state.children[state.activeChildId];
+      c[el.dataset.field] = el.value;
+      await saveRoster();
+      render();
+    };
+  });
+
+  const notesArea = document.getElementById('notesArea');
+  if(notesArea) notesArea.onblur = async () => {
+    state.children[state.activeChildId].notes[state.activeTerm] = notesArea.value;
+    await saveRoster();
+  };
+  const se = document.getElementById('signEducator');
+  if(se) se.onblur = async () => { state.children[state.activeChildId].signedEducator[state.activeTerm] = se.value; await saveRoster(); };
+  const sp = document.getElementById('signParent');
+  if(sp) sp.onblur = async () => { state.children[state.activeChildId].signedParent[state.activeTerm] = sp.value; await saveRoster(); };
+
+  const delBtn = document.getElementById('btnDelete');
+  if(delBtn) delBtn.onclick = async () => {
+    const c = state.children[state.activeChildId];
+    if(!confirm(`Remove ${c.name}'s report from this device? This cannot be undone.`)) return;
+    delete state.children[c.id];
+    state.activeChildId = null;
+    await saveRoster();
+    render();
+  };
+
+  const exportBtn = document.getElementById('btnExport');
+  if(exportBtn) exportBtn.onclick = () => exportPdf(state.children[state.activeChildId]);
+
+  const backupExportBtn = document.getElementById('btnBackupExport');
+  if(backupExportBtn) backupExportBtn.onclick = () => {
+    const blob = new Blob([JSON.stringify(state.children, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `SpaceKidz_${AGE_LABEL.replace(/\s+/g,'_')}_backup_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const backupImportBtn = document.getElementById('btnBackupImport');
+  const fileImport = document.getElementById('fileImport');
+  if(backupImportBtn) backupImportBtn.onclick = () => fileImport.click();
+  if(fileImport) fileImport.onchange = (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      try{
+        const incoming = JSON.parse(ev.target.result);
+        const mode = confirm("Click OK to MERGE this backup with your current children, or Cancel to REPLACE everything with the backup file.");
+        if(mode){ state.children = { ...state.children, ...incoming }; }
+        else { state.children = incoming; }
+        await saveRoster();
+        const ids = Object.keys(state.children);
+        if(ids.length) state.activeChildId = ids[0];
+        render();
+        alert("Backup restored successfully.");
+      }catch(err){ alert("Could not read that file — please check it's a SpaceKidz backup .json file."); }
+    };
+    reader.readAsText(file);
+    fileImport.value = '';
+  };
+}
+
+/* ===================== PDF EXPORT ===================== */
+async function exportPdf(c){
+  const root = document.getElementById('pdf-root');
+  root.innerHTML = '';
+  const pages = [];
+
+  // Cover page
+  pages.push(`
+    <div class="pdf-page">
+      <div class="pdf-border"></div>
+      <div class="pdf-header">
+        ${svgRocket()}
+        <div>
+          <div class="pdf-wordmark"><span style="color:#7B3FA0">S</span><span style="color:#3FBFCF">P</span><span style="color:#7CB342">A</span><span style="color:#F5A623">C</span><span style="color:#E85D9C">E</span><span style="color:#7B3FA0">K</span><span style="color:#3FBFCF">I</span><span style="color:#7CB342">D</span><span style="color:#F5A623">Z</span></div>
+          <div class="pdf-tagline">SELECTIVE PLAY AND CHILD EDUCATION</div>
+        </div>
+      </div>
+      <div class="pdf-infobox">
+        <div><b>Name and Surname:</b> ${escapeHtml(c.name)}</div>
+        <div><b>Date of Birth:</b> ${escapeHtml(c.dob)}</div>
+        <div><b>Educator:</b> ${escapeHtml(c.educator)}</div>
+        <div><b>Class:</b> ${escapeHtml(c.className)}</div>
+        <div><b>Year:</b> ${escapeHtml(c.year)}</div>
+      </div>
+      <div style="height:60px;"></div>
+      <div class="pdf-title">Progress Report</div>
+      <div class="pdf-tagline2">${AGE_LABEL}</div>
+      <div style="height:140px;"></div>
+      <div class="pdf-foot">Cathkin Academy &amp; SpaceKidz &middot; Ravenswood, Boksburg, Gauteng</div>
+    </div>
+  `);
+
+  // One page per term with full table + notes
+  TERMS.forEach((termName, ti) => {
+    const termData = c.terms[ti] || {};
+    let body = `<div class="pdf-page">
+      <div class="pdf-term">${termName} — ${escapeHtml(c.name)}</div>`;
+    CATEGORIES.forEach((cat, ci) => {
+      body += `<div class="pdf-cat" style="background:${cat.color}">${cat.name}</div>
+        <table class="pdf-table">`;
+      cat.items.forEach((item, ii) => {
+        const key = `${ci}_${ii}`;
+        const val = termData[key];
+        body += `<tr><td class="lbl">${item}</td><td class="val">${val ? val + ' — ' + SCALE_LABELS[val] : '—'}</td></tr>`;
+      });
+      body += `</table>`;
+    });
+    body += `
+      <div class="pdf-notes">
+        <b>General Observation from Educator:</b><br>${escapeHtml(c.notes[ti]||'').replace(/\n/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}
+      </div>
+      <div class="pdf-sign">
+        <div>Signed: Educator — ${escapeHtml(c.signedEducator[ti]||'________________')}</div>
+        <div>Signed: Parent — ${escapeHtml(c.signedParent[ti]||'________________')}</div>
+      </div>
+      <div class="pdf-foot">SpaceKidz Progress Report &middot; ${AGE_LABEL} &middot; Page ${ti+2}</div>
+    </div>`;
+    pages.push(body);
+  });
+
+  root.innerHTML = pages.join('');
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p','pt','a4');
+  const pageEls = root.querySelectorAll('.pdf-page');
+  for(let i=0;i<pageEls.length;i++){
+    const canvas = await html2canvas(pageEls[i], { scale:2, backgroundColor:'#ffffff' });
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    const pw = pdf.internal.pageSize.getWidth();
+    const ph = pdf.internal.pageSize.getHeight();
+    const ratio = Math.min(pw/canvas.width, ph/canvas.height);
+    const w = canvas.width*ratio, h = canvas.height*ratio;
+    if(i>0) pdf.addPage();
+    pdf.addImage(imgData, 'JPEG', (pw-w)/2, 20, w, h);
+  }
+  pdf.save(`${(c.name||'report').replace(/\s+/g,'_')}_SpaceKidz_Progress_Report.pdf`);
+  root.innerHTML = '';
+}
+
+/* ===================== INIT ===================== */
+(async function init(){
+  await loadAll();
+  const ids = Object.keys(state.children);
+  if(ids.length) state.activeChildId = ids.sort((a,b)=>state.children[a].name.localeCompare(state.children[b].name))[0];
+  render();
+})();
+</script>
+</body>
+</html>
