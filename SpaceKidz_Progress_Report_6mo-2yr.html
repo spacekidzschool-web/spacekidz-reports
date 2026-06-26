@@ -8,6 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/api.js"></script>
 <style>
   :root{
     --purple:#7B3FA0;
@@ -240,23 +241,25 @@ const AGE_LABEL = "6 months – 2 years";
 const STORAGE_PREFIX = "spacekidz-6mo2yr";
 
 // ===== Google Drive configuration =====
-// Fill this in once you have it from Google Cloud Console (see setup guide).
-// It comes from the "OAuth client ID" credential (Web application type).
+// Fill these in once you have them from Google Cloud Console (see setup guide).
 const GOOGLE_CLIENT_ID = "784962094785-es8f4soa283b7cr9jjdulophksh0vp7p.apps.googleusercontent.com";
+const GOOGLE_PICKER_API_KEY = "AIzaSyCCQiletkW6gCwNUrbLOZuP-qFsKXTIvRo";
+const GOOGLE_PROJECT_NUMBER = "784962094785"; // used as the Picker App ID
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
-const ROOT_FOLDER_NAME = "SpaceKidz Progress Reports";
-const SUBFOLDER_NAME = "6 months to 2 years"; // per-app subfolder, matches AGE_LABEL in spirit
 const DATA_FILENAME = "roster.json";
+const FOLDER_MEMORY_KEY = STORAGE_PREFIX + ":chosenFolderId";
 
 let state = { children: {}, activeChildId: null, activeTerm: 0 };
-let drive = { accessToken: null, fileId: null, folderId: null, tokenClient: null, ready: false, busy: false };
+let drive = { accessToken: null, fileId: null, folderId: null, folderName: null, tokenClient: null, ready: false, busy: false, pickerLoaded: false };
 
 /* ===================== GOOGLE DRIVE STORAGE ===================== */
-// This app stores its one data file (roster.json) inside a folder structure
-// in the signed-in Google account's own Drive:
-//   SpaceKidz Progress Reports / 6 months to 2 years / roster.json
-// The drive.file scope means this app can only see files it creates itself —
-// it cannot browse or read the rest of the Drive.
+// This app stores its one data file (roster.json) inside a Drive folder the
+// educator picks themselves via the Google Picker — normally a folder the
+// Director has shared with them (e.g. "6 months to 2 years"). The drive.file
+// scope means this app can only see files it creates AND files the person
+// explicitly selects through the Picker — it cannot otherwise browse their Drive.
+// The chosen folder's ID is remembered in this browser so the picker only
+// needs to be used once per device.
 
 function driveConfigured(){
   return GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith("YOUR_");
@@ -304,23 +307,54 @@ async function driveFetch(url, options={}){
   return res;
 }
 
-async function findOrCreateFolder(name, parentId){
-  let q = `mimeType='application/vnd.google-apps.folder' and name='${name.replace(/'/g,"\\'")}' and trashed=false`;
-  q += parentId ? ` and '${parentId}' in parents` : ` and 'root' in parents`;
-  const searchUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)`;
-  const res = await driveFetch(searchUrl);
-  const data = await res.json();
-  if(data.files && data.files.length > 0) return data.files[0].id;
-
-  const metadata = { name, mimeType: 'application/vnd.google-apps.folder' };
-  if(parentId) metadata.parents = [parentId];
-  const createRes = await driveFetch('https://www.googleapis.com/drive/v3/files?fields=id', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(metadata),
+function loadGapiPicker(){
+  return new Promise((resolve, reject) => {
+    if(drive.pickerLoaded){ resolve(); return; }
+    if(typeof gapi === 'undefined'){
+      reject(new Error("Google API library did not load. Check your internet connection and refresh."));
+      return;
+    }
+    gapi.load('picker', () => { drive.pickerLoaded = true; resolve(); });
   });
-  const created = await createRes.json();
-  return created.id;
+}
+
+function openFolderPicker(){
+  return new Promise(async (resolve, reject) => {
+    try{ await loadGapiPicker(); }catch(e){ reject(e); return; }
+    const view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+      .setSelectFolderEnabled(true)
+      .setIncludeFolders(true)
+      .setMimeTypes('application/vnd.google-apps.folder');
+    const picker = new google.picker.PickerBuilder()
+      .setOAuthToken(drive.accessToken)
+      .setDeveloperKey(GOOGLE_PICKER_API_KEY)
+      .setAppId(GOOGLE_PROJECT_NUMBER)
+      .addView(view)
+      .setTitle('Choose your class folder')
+      .setCallback((data) => {
+        if(data.action === google.picker.Action.PICKED){
+          const folder = data.docs[0];
+          resolve({ id: folder.id, name: folder.name });
+        } else if(data.action === google.picker.Action.CANCEL){
+          reject(new Error('cancelled'));
+        }
+      })
+      .build();
+    picker.setVisible(true);
+  });
+}
+
+function rememberFolder(folderId, folderName){
+  try{ localStorage.setItem(FOLDER_MEMORY_KEY, JSON.stringify({ id: folderId, name: folderName })); }catch(e){}
+}
+function forgetFolder(){
+  try{ localStorage.removeItem(FOLDER_MEMORY_KEY); }catch(e){}
+}
+function recallFolder(){
+  try{
+    const raw = localStorage.getItem(FOLDER_MEMORY_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
 }
 
 async function findOrCreateDataFile(folderId){
@@ -356,8 +390,10 @@ async function driveUploadFile(fileId, folderId, jsonData){
   return result.id;
 }
 
-async function connectToDrive(){
-  drive.folderId = await findOrCreateFolder(SUBFOLDER_NAME, await findOrCreateFolder(ROOT_FOLDER_NAME, null));
+async function connectToDrive(folder){
+  drive.folderId = folder.id;
+  drive.folderName = folder.name;
+  rememberFolder(folder.id, folder.name);
   drive.fileId = await findOrCreateDataFile(drive.folderId);
   if(drive.fileId){
     state.children = await driveDownloadFile(drive.fileId);
@@ -462,8 +498,12 @@ function render(){
       </div>
       <div class="sidebar-foot">
         Cathkin Academy &amp; SpaceKidz<br>Ravenswood, Boksburg
-        <div class="drive-status" id="driveStatus" style="justify-content:center;margin-top:6px;"><span class="dot-live"></span> Saved to Drive</div>
-        <button class="btn-signout" id="btnSignOut" style="margin-top:4px;">Sign out</button>
+        ${drive.folderName ? `<div style="font-size:10.5px;color:var(--muted);margin-top:6px;">Folder: <b style="color:var(--ink)">${escapeHtml(drive.folderName)}</b></div>` : ''}
+        <div class="drive-status" id="driveStatus" style="justify-content:center;margin-top:4px;"><span class="dot-live"></span> Saved to Drive</div>
+        <div style="margin-top:4px;display:flex;gap:10px;justify-content:center;">
+          <button class="btn-signout" id="btnChangeFolder">Change folder</button>
+          <button class="btn-signout" id="btnSignOut">Sign out</button>
+        </div>
       </div>
     </div>
 
@@ -650,10 +690,18 @@ function attachEvents(){
     fileImport.value = '';
   };
 
+  const changeFolderBtn = document.getElementById('btnChangeFolder');
+  if(changeFolderBtn) changeFolderBtn.onclick = async () => {
+    if(!confirm("Choose a different Drive folder? Your current entries stay safe in the old folder — you'll just be pointing this device at a new one.")) return;
+    forgetFolder();
+    renderChooseFolder();
+  };
+
   const signOutBtn = document.getElementById('btnSignOut');
   if(signOutBtn) signOutBtn.onclick = () => {
     if(drive.accessToken){ google.accounts.oauth2.revoke(drive.accessToken, () => {}); }
-    drive = { accessToken: null, fileId: null, folderId: null, tokenClient: drive.tokenClient, ready: false, busy: false };
+    forgetFolder();
+    drive = { accessToken: null, fileId: null, folderId: null, folderName: null, tokenClient: drive.tokenClient, ready: false, busy: false, pickerLoaded: drive.pickerLoaded };
     state = { children: {}, activeChildId: null, activeTerm: 0 };
     renderSignIn();
   };
@@ -754,7 +802,7 @@ function renderSignIn(errorMsg){
     <div class="signin-screen">
       ${svgRocket()}
       <h1>SpaceKidz Progress Reports</h1>
-      <p>${AGE_LABEL} &middot; Sign in with the SpaceKidz Google account to load and save reports to Drive.</p>
+      <p>${AGE_LABEL} &middot; Sign in with your Google account to load and save reports to Drive.</p>
       ${errorMsg ? `<p class="signin-error">${escapeHtml(errorMsg)}</p>` : ''}
       <button class="btn-google" id="btnGoogleSignIn">
         <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.09-1.8 2.73v2.27h2.91c1.7-1.57 2.69-3.88 2.69-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.81 5.96-2.18l-2.91-2.27c-.81.54-1.84.86-3.05.86-2.35 0-4.34-1.58-5.05-3.71H.96v2.33C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.95 10.7c-.18-.54-.28-1.11-.28-1.7s.1-1.16.28-1.7V4.97H.96A8.99 8.99 0 000 9c0 1.45.35 2.83.96 4.03l2.99-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.97l2.99 2.33C4.66 5.16 6.65 3.58 9 3.58z"/></svg>
@@ -767,15 +815,68 @@ function renderSignIn(errorMsg){
     btn.disabled = true; btn.textContent = 'Connecting…';
     try{
       await requestDriveAccess();
-      await connectToDrive();
-      const ids = Object.keys(state.children);
-      if(ids.length) state.activeChildId = ids.sort((a,b)=>state.children[a].name.localeCompare(state.children[b].name))[0];
-      render();
+      await proceedAfterSignIn();
     }catch(e){
       console.error(e);
       renderSignIn("Sign-in didn't complete. Please try again.");
     }
   };
+}
+
+async function proceedAfterSignIn(){
+  const remembered = recallFolder();
+  if(remembered){
+    try{
+      await connectToDrive(remembered);
+      finishLoadingIntoApp();
+      return;
+    }catch(e){
+      console.error("Remembered folder failed, asking to choose again", e);
+      forgetFolder();
+    }
+  }
+  renderChooseFolder();
+}
+
+function renderChooseFolder(errorMsg){
+  document.getElementById('app').innerHTML = `
+    <div class="signin-screen">
+      ${svgRocket()}
+      <h1>Choose your class folder</h1>
+      <p>${AGE_LABEL} &middot; Pick the Drive folder your Director shared with you for this class. You'll only need to do this once on this device.</p>
+      ${errorMsg ? `<p class="signin-error">${escapeHtml(errorMsg)}</p>` : ''}
+      <button class="btn-google" id="btnChooseFolder">
+        ${svgFolderIcon()}
+        Choose folder
+      </button>
+    </div>
+  `;
+  const btn = document.getElementById('btnChooseFolder');
+  if(btn) btn.onclick = async () => {
+    btn.disabled = true; btn.textContent = 'Opening Google Drive…';
+    try{
+      const folder = await openFolderPicker();
+      await connectToDrive(folder);
+      finishLoadingIntoApp();
+    }catch(e){
+      if(e.message === 'cancelled'){
+        renderChooseFolder();
+      } else {
+        console.error(e);
+        renderChooseFolder("Something went wrong opening the folder picker. Please try again.");
+      }
+    }
+  };
+}
+
+function finishLoadingIntoApp(){
+  const ids = Object.keys(state.children);
+  if(ids.length) state.activeChildId = ids.sort((a,b)=>state.children[a].name.localeCompare(state.children[b].name))[0];
+  render();
+}
+
+function svgFolderIcon(){
+  return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6.5C3 5.67 3.67 5 4.5 5h4.46c.4 0 .78.16 1.06.44l1.5 1.5c.28.28.66.44 1.06.44H19.5c.83 0 1.5.67 1.5 1.5v9c0 .83-.67 1.5-1.5 1.5h-15A1.5 1.5 0 013 17.94V6.5z" stroke="#F5A623" stroke-width="1.6"/></svg>`;
 }
 
 /* ===================== INIT ===================== */
