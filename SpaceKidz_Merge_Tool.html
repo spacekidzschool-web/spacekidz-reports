@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SpaceKidz — Merge Tool (Director only)</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root{--purple:#7B3FA0;--cyan:#3FBFCF;--green:#7CB342;--gold:#F5A623;--pink:#E85D9C;--ink:#2B2530;--muted:#8A7F8D;--line:#E8DFD2;--paper:#FFFBF5;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--paper);font-family:'Inter',sans-serif;color:var(--ink);padding:32px;}
+h1{font-family:'Baloo 2';font-weight:800;font-size:26px;color:var(--purple);margin:0 0 4px;}
+.sub{color:var(--muted);font-size:13px;margin-bottom:28px;}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin-bottom:16px;}
+.card h3{font-family:'Baloo 2';font-size:16px;margin:0 0 10px;color:var(--ink);}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11.5px;font-weight:700;margin-right:6px;margin-bottom:4px;}
+.badge-purple{background:#F0E4F8;color:var(--purple);}
+.badge-green{background:#EEF6E5;color:var(--green);}
+.badge-gold{background:#FEF5E4;color:#B07A10;}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;}
+th{text-align:left;padding:7px 10px;background:#F8F1FB;color:var(--purple);font-weight:700;font-size:12px;border-bottom:2px solid var(--line);}
+td{padding:7px 10px;border-bottom:1px solid var(--line);}
+tr:last-child td{border-bottom:none;}
+.btn{font-family:'Inter';font-weight:700;font-size:14px;border-radius:10px;padding:11px 22px;cursor:pointer;border:none;transition:transform .1s;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--purple);color:white;}
+.btn-primary:hover{background:#622f80;}
+.btn-primary:disabled{background:#ccc;cursor:not-allowed;}
+.btn-google{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 22px;font-family:'Inter';font-weight:600;font-size:14px;color:var(--ink);cursor:pointer;}
+.btn-google:hover{border-color:var(--purple);}
+.status{font-size:13px;color:var(--muted);margin-top:10px;}
+.status.ok{color:var(--green);}
+.status.err{color:#C0293F;}
+.log{background:#F8F1FB;border-radius:10px;padding:14px;font-size:12px;color:var(--muted);max-height:220px;overflow-y:auto;margin-top:12px;white-space:pre-wrap;font-family:monospace;}
+.warn{background:#FEF5E4;border:1px solid #F5C842;border-radius:10px;padding:14px 18px;font-size:13px;color:#7A5500;margin-bottom:18px;}
+.screen{display:none;}
+.screen.active{display:block;}
+</style>
+</head>
+<body>
+<h1>SpaceKidz Merge Tool</h1>
+<p class="sub">Director use only — merges all separate roster.json files in each class folder into one combined file.</p>
+<div class="warn">Run this once only, then delete this file from your GitHub repo. It reads and writes your Google Drive directly.</div>
+
+<div class="screen active" id="s1">
+  <div class="card">
+    <h3>Step 1 — Sign in as Director</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Sign in with spacekidzschool@gmail.com so the tool can access all shared folders.</p>
+    <button class="btn-google" id="btnSignIn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.09-1.8 2.73v2.27h2.91c1.7-1.57 2.69-3.88 2.69-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.81 5.96-2.18l-2.91-2.27c-.81.54-1.84.86-3.05.86-2.35 0-4.34-1.58-5.05-3.71H.96v2.33C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.95 10.7c-.18-.54-.28-1.11-.28-1.7s.1-1.16.28-1.7V4.97H.96A8.99 8.99 0 000 9c0 1.45.35 2.83.96 4.03l2.99-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.97l2.99 2.33C4.66 5.16 6.65 3.58 9 3.58z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="status" id="s1status"></div>
+  </div>
+</div>
+
+<div class="screen" id="s2">
+  <div class="card">
+    <h3>Step 2 — Scan all class folders</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Reads every roster.json across all 5 class folders. Nothing is written yet.</p>
+    <button class="btn btn-primary" id="btnScan">Scan Drive folders</button>
+    <div class="log" id="scanLog" style="display:none;"></div>
+  </div>
+</div>
+
+<div class="screen" id="s3">
+  <div class="card">
+    <h3>Step 3 — Review and confirm</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Review the merge below. Click Merge and Save to write one combined roster.json per folder. Old files are left untouched as backup.</p>
+    <div id="preview"></div>
+    <div style="margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="btnMerge">Merge and Save all folders</button>
+      <span class="status" id="mergeStatus"></span>
+    </div>
+    <div class="log" id="mergeLog" style="display:none;"></div>
+  </div>
+</div>
+
+<div class="screen" id="s4">
+  <div class="card">
+    <h3>Merge complete</h3>
+    <p style="font-size:13px;color:var(--muted);">One combined roster.json has been written to each class folder. Open the class links now to confirm all learners appear together.</p>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px;">The old individual files are still in Drive as backup. Once you confirm everything looks correct in the apps, you can delete the extras manually — keep only the one with the most recent date per folder.</p>
+    <div id="doneList" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<script>
+const CLIENT_ID = "784962094785-es8f4soa283b7cr9jjdulophksh0vp7p.apps.googleusercontent.com";
+const SCOPE = "https://www.googleapis.com/auth/drive";
+const ROOT_FOLDER_NAME = "SpaceKidz Progress Reports";
+const CLASS_FOLDERS = ["6 months to 2 years","2 to 3 years","Grade RRR","Grade RR","Grade R"];
+
+let accessToken = null;
+let tokenClient = null;
+let scanResults = {};
+
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function addLog(elId, msg){ const el=document.getElementById(elId); el.style.display='block'; el.textContent+=msg+'\n'; el.scrollTop=el.scrollHeight; }
+
+window.addEventListener('load', () => {
+  const wait = setInterval(() => {
+    if(typeof google !== 'undefined' && google.accounts){
+      clearInterval(wait);
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPE,
+        callback: (resp) => {
+          if(resp.error){ document.getElementById('s1status').textContent='Sign-in failed: '+resp.error; return; }
+          accessToken = resp.access_token;
+          document.getElementById('s1status').textContent='Signed in successfully';
+          document.getElementById('s1status').className='status ok';
+          setTimeout(()=>show('s2'), 700);
+        }
+      });
+      document.getElementById('btnSignIn').onclick = () => tokenClient.requestAccessToken({ prompt:'' });
+    }
+  }, 300);
+});
+
+async function df(url, opts={}){
+  const r = await fetch(url, {...opts, headers:{Authorization:'Bearer '+accessToken,...(opts.headers||{})}});
+  if(!r.ok){ const t=await r.text(); throw new Error(r.status+': '+t.slice(0,200)); }
+  return r;
+}
+
+async function findFolder(name, parentId){
+  let q = "mimeType='application/vnd.google-apps.folder' and name='"+name.replace(/'/g,"\\'")+"' and trashed=false";
+  q += parentId ? " and '"+parentId+"' in parents" : " and 'root' in parents";
+  const r = await df('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id,name)');
+  const d = await r.json();
+  return (d.files && d.files.length > 0) ? d.files[0] : null;
+}
+
+async function listRosters(folderId){
+  const q = "name='roster.json' and trashed=false and '"+folderId+"' in parents";
+  const r = await df('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id,name,modifiedTime,size,owners)&orderBy=modifiedTime+desc');
+  const d = await r.json();
+  return d.files || [];
+}
+
+async function downloadFile(fileId){
+  const r = await df('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media');
+  return r.json();
+}
+
+async function uploadFile(fileId, folderId, data){
+  const boundary = '---spacekidz'+Date.now();
+  const meta = fileId ? {} : {name:'roster.json', parents:[folderId], mimeType:'application/json'};
+  const body =
+    '--'+boundary+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify(meta)+'\r\n'+
+    '--'+boundary+'\r\nContent-Type: application/json\r\n\r\n'+JSON.stringify(data)+'\r\n'+
+    '--'+boundary+'--';
+  const url = fileId
+    ? 'https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=multipart'
+    : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+  const r = await df(url, {method: fileId?'PATCH':'POST', headers:{'Content-Type':'multipart/related; boundary='+boundary}, body});
+  return r.json();
+}
+
+function mergeChildren(files){
+  const sorted = [...files].sort((a,b)=>a.modified.localeCompare(b.modified));
+  const merged = {};
+  for(const f of sorted){
+    for(const [id, child] of Object.entries(f.children)){
+      if(!child._addedBy) child._addedBy = f.ownerEmail;
+      merged[id] = child;
+    }
+  }
+  return merged;
+}
+
+document.getElementById('btnScan').onclick = async () => {
+  const btn = document.getElementById('btnScan');
+  btn.disabled = true; btn.textContent = 'Scanning...';
+  addLog('scanLog','Looking for: '+ROOT_FOLDER_NAME);
+  try{
+    const root = await findFolder(ROOT_FOLDER_NAME, null);
+    if(!root){ addLog('scanLog','Root folder not found. Are you signed in as the right account?'); btn.disabled=false; btn.textContent='Retry'; return; }
+    addLog('scanLog','Found root folder ('+root.id+')');
+    scanResults = {};
+    for(const cls of CLASS_FOLDERS){
+      addLog('scanLog','\nChecking: '+cls);
+      const cf = await findFolder(cls, root.id);
+      if(!cf){ addLog('scanLog','  Folder not found, skipping'); continue; }
+      const files = await listRosters(cf.id);
+      addLog('scanLog','  '+files.length+' roster.json file(s)');
+      const fileData = [];
+      for(const f of files){
+        try{
+          const data = await downloadFile(f.id);
+          const ownerEmail = f.owners&&f.owners[0] ? f.owners[0].emailAddress : 'unknown';
+          const count = Object.keys(data).length;
+          addLog('scanLog','  · '+ownerEmail+': '+count+' children ('+f.modifiedTime.slice(0,10)+', '+(f.size||'?')+' bytes)');
+          fileData.push({ fileId:f.id, ownerEmail, children:data, modified:f.modifiedTime, size:parseInt(f.size)||0 });
+        }catch(e){ addLog('scanLog','  · Could not read file '+f.id+': '+e.message); }
+      }
+      scanResults[cls] = { folderId:cf.id, files:fileData };
+    }
+    addLog('scanLog','\nScan complete.');
+    buildPreview();
+    show('s3');
+  }catch(e){ addLog('scanLog','Error: '+e.message); btn.disabled=false; btn.textContent='Retry'; }
+};
+
+function buildPreview(){
+  let html = '';
+  for(const [cls, data] of Object.entries(scanResults)){
+    const merged = mergeChildren(data.files);
+    const count = Object.keys(merged).length;
+    html += '<div style="margin-bottom:20px;">';
+    html += '<div style="font-family:Baloo 2,sans-serif;font-weight:700;font-size:15px;margin-bottom:6px;">'+cls+'</div>';
+    if(data.files.length===0){
+      html += '<span class="badge badge-gold">No files found — will skip</span>';
+    } else {
+      html += '<span class="badge badge-purple">'+data.files.length+' file(s) to merge</span>';
+      html += '<span class="badge badge-green">'+count+' unique children in result</span>';
+      html += '<table><tr><th>Educator email</th><th>Children</th><th>Last modified</th></tr>';
+      for(const f of data.files){
+        html += '<tr><td>'+f.ownerEmail+'</td><td>'+Object.keys(f.children).length+'</td><td>'+f.modified.slice(0,10)+'</td></tr>';
+      }
+      html += '</table>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('preview').innerHTML = html;
+}
+
+document.getElementById('btnMerge').onclick = async () => {
+  const btn = document.getElementById('btnMerge');
+  const status = document.getElementById('mergeStatus');
+  btn.disabled=true; btn.textContent='Merging...';
+  const done = [];
+  try{
+    for(const [cls, data] of Object.entries(scanResults)){
+      if(data.files.length===0){ addLog('mergeLog',cls+': no files, skipping'); continue; }
+      addLog('mergeLog',cls+': merging '+data.files.length+' file(s)...');
+      const merged = mergeChildren(data.files);
+      const target = [...data.files].sort((a,b)=>b.size-a.size)[0];
+      await uploadFile(target.fileId, data.folderId, merged);
+      const count = Object.keys(merged).length;
+      addLog('mergeLog','  Done — '+count+' children written to '+target.fileId);
+      done.push({ cls, count });
+    }
+    status.textContent='All done!'; status.className='status ok';
+    document.getElementById('doneList').innerHTML = done.map(d=>
+      '<div style="font-size:13px;margin-top:6px; color:var(--green);">'+d.cls+' — '+d.count+' children</div>'
+    ).join('');
+    show('s4');
+  }catch(e){
+    addLog('mergeLog','Error: '+e.message);
+    status.textContent='Error — see log'; status.className='status err';
+    btn.disabled=false; btn.textContent='Retry';
+  }
+};
+</script>
+</body>
+</html>
