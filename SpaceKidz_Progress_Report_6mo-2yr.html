@@ -73,6 +73,11 @@
   .dot.partial{ background:var(--gold); }
   .empty-roster{ text-align:center; color:var(--muted); font-size:12.5px; padding:30px 10px; }
 
+  .search-box{ width:100%; border:1px solid var(--line); border-radius:8px; padding:7px 10px; font-family:'Inter'; font-size:12.5px; background:#fff; margin-bottom:8px; }
+  .search-box:focus{ outline:none; border-color:var(--purple); }
+  .no-match{ text-align:center; color:var(--muted); font-size:12px; padding:16px 0; }
+
+
   .sidebar-foot{ font-size:10.5px; color:var(--muted); text-align:center; padding-top:8px; border-top:1px solid var(--line); }
   .backup-row{ display:flex; gap:6px; }
   .btn-tiny{
@@ -245,11 +250,11 @@ const STORAGE_PREFIX = "spacekidz-6mo2yr";
 const GOOGLE_CLIENT_ID = "784962094785-es8f4soa283b7cr9jjdulophksh0vp7p.apps.googleusercontent.com";
 const GOOGLE_PICKER_API_KEY = "AIzaSyCCQiletkW6gCwNUrbLOZuP-qFsKXTIvRo";
 const GOOGLE_PROJECT_NUMBER = "784962094785"; // used as the Picker App ID
-const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive";
 const DATA_FILENAME = "roster.json";
 const FOLDER_MEMORY_KEY = STORAGE_PREFIX + ":chosenFolderId";
 
-let state = { children: {}, activeChildId: null, activeTerm: 0 };
+let state = { children: {}, activeChildId: null, activeTerm: 0, search: '' };
 let drive = { accessToken: null, fileId: null, folderId: null, folderName: null, tokenClient: null, ready: false, busy: false, pickerLoaded: false };
 
 /* ===================== GOOGLE DRIVE STORAGE ===================== */
@@ -359,9 +364,10 @@ function recallFolder(){
 
 async function findOrCreateDataFile(folderId){
   const q = `name='${DATA_FILENAME}' and trashed=false and '${folderId}' in parents`;
-  const searchUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)`;
+  const searchUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,size)&orderBy=quotaBytesUsed+desc`;
   const res = await driveFetch(searchUrl);
   const data = await res.json();
+  // Pick the largest file — it has the most data (avoids picking an empty placeholder)
   if(data.files && data.files.length > 0) return data.files[0].id;
   return null; // will be created on first save
 }
@@ -475,9 +481,14 @@ function render(){
         <h3>Children (${childArr.length})</h3>
         <button class="btn-add" id="btnAddChild" title="Add child">+</button>
       </div>
+      <input class="search-box" id="childSearch" placeholder="Search by name..." oninput="filterRoster(this.value)">
       <div class="roster" id="roster">
-        ${childArr.length === 0 ? `<div class="empty-roster">No children yet.<br>Click + to add your first learner.</div>` :
-          childArr.map(c => {
+        ${(()=>{
+          const q = (state.search||'').toLowerCase();
+          const visible = childArr.filter(c=>(c.name||'').toLowerCase().includes(q));
+          if(childArr.length === 0) return `<div class="empty-roster">No children yet.<br>Click + to add your first learner.</div>`;
+          if(visible.length === 0) return `<div class="no-match">No match for "${escapeHtml(state.search||'')}"</div>`;
+          return visible.map(c => {
             const filled = c.terms.map(t => filledCount(t));
             const total = totalFields();
             return `
@@ -488,8 +499,8 @@ function render(){
                 ${filled.map(f => `<div class="dot ${f>=total?'done':(f>0?'partial':'')}"></div>`).join('')}
               </div>
             </div>`;
-          }).join('')
-        }
+          }).join('');
+        })()}
       </div>
       <div class="backup-row">
         <button class="btn-tiny" id="btnBackupExport">⬇ Backup data</button>
@@ -539,6 +550,7 @@ function renderMain(c){
         </div>
       </div>
       <div class="actions">
+        <button class="btn btn-ghost" id="btnExportAll">⬇ Export all PDFs</button>
         <button class="btn btn-ghost" id="btnExport">⬇ Export PDF</button>
         <button class="btn btn-danger" id="btnDelete">Remove</button>
       </div>
@@ -587,6 +599,14 @@ function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'
 function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
 
 /* ===================== EVENTS ===================== */
+
+function filterRoster(val){
+  state.search = val;
+  render();
+  // restore focus and cursor position after render
+  const el = document.getElementById('childSearch');
+  if(el){ el.focus(); el.value = val; }
+}
 function attachEvents(){
   const addBtn = document.getElementById('btnAddChild');
   if(addBtn) addBtn.onclick = async () => {
@@ -690,6 +710,22 @@ function attachEvents(){
     fileImport.value = '';
   };
 
+
+  const exportAllBtn = document.getElementById('btnExportAll');
+  if(exportAllBtn) exportAllBtn.onclick = async () => {
+    const children = Object.values(state.children).sort((a,b)=>a.name.localeCompare(b.name));
+    if(children.length === 0){ alert('No children to export.'); return; }
+    exportAllBtn.disabled = true;
+    const orig = exportAllBtn.textContent;
+    for(let i=0; i<children.length; i++){
+      exportAllBtn.textContent = `Exporting ${i+1} of ${children.length}...`;
+      await exportPdf(children[i]);
+      // small delay so browser can process the download
+      await new Promise(r=>setTimeout(r, 600));
+    }
+    exportAllBtn.disabled = false;
+    exportAllBtn.textContent = orig;
+  };
   const changeFolderBtn = document.getElementById('btnChangeFolder');
   if(changeFolderBtn) changeFolderBtn.onclick = async () => {
     if(!confirm("Choose a different Drive folder? Your current entries stay safe in the old folder — you'll just be pointing this device at a new one.")) return;
