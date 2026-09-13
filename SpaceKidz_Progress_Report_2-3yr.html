@@ -34,7 +34,7 @@
     -webkit-font-smoothing:antialiased;
   }
   .app{ display:flex; min-height:100vh; }
-
+ 
   /* ---------- SIDEBAR ---------- */
   .sidebar{
     width:280px;
@@ -52,12 +52,12 @@
   .brand-text .s1{color:var(--purple)} .brand-text .s2{color:var(--cyan)} .brand-text .s3{color:var(--green)} .brand-text .s4{color:var(--gold)} .brand-text .s5{color:var(--pink)}
   .brand-sub{ font-size:10px; color:var(--muted); font-weight:600; letter-spacing:0.3px; margin-top:2px;}
   .age-tag{ display:inline-block; margin-top:8px; background:linear-gradient(135deg,var(--cyan),var(--purple)); color:white; font-family:'Baloo 2'; font-weight:700; font-size:12px; padding:4px 10px; border-radius:20px; }
-
+ 
   .roster-head{ display:flex; align-items:center; justify-content:space-between; margin-top:4px;}
   .roster-head h3{ font-family:'Baloo 2'; font-size:13px; text-transform:uppercase; letter-spacing:0.6px; color:var(--muted); margin:0; }
   .btn-add{ width:26px;height:26px;border-radius:8px;border:none;background:var(--purple);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center; line-height:1;}
   .btn-add:hover{background:#622f80;}
-
+ 
   .roster{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
   .child-card{
     border:1px solid var(--line); border-radius:12px; padding:10px 12px; cursor:pointer; background:#fff;
@@ -72,12 +72,12 @@
   .dot.done{ background:var(--green); }
   .dot.partial{ background:var(--gold); }
   .empty-roster{ text-align:center; color:var(--muted); font-size:12.5px; padding:30px 10px; }
-
+ 
   .search-box{ width:100%; border:1px solid var(--line); border-radius:8px; padding:7px 10px; font-family:'Inter'; font-size:12.5px; background:#fff; margin-bottom:8px; }
   .search-box:focus{ outline:none; border-color:var(--purple); }
   .no-match{ text-align:center; color:var(--muted); font-size:12px; padding:16px 0; }
-
-
+ 
+ 
   .sidebar-foot{ font-size:10.5px; color:var(--muted); text-align:center; padding-top:8px; border-top:1px solid var(--line); }
   .backup-row{ display:flex; gap:6px; }
   .btn-tiny{
@@ -85,7 +85,7 @@
     background:#fff; color:var(--muted); cursor:pointer; font-family:'Inter';
   }
   .btn-tiny:hover{ border-color:var(--purple); color:var(--purple); }
-
+ 
   /* ---------- MAIN ---------- */
   .main{ flex:1; padding:24px 32px 60px; max-width:980px; }
   .topbar{ display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:18px; flex-wrap:wrap;}
@@ -97,7 +97,7 @@
   }
   .field-row label{ font-size:10.5px; color:var(--muted); display:block; margin-bottom:3px; font-weight:600;}
   .field-group{ display:flex; flex-direction:column; }
-
+ 
   .actions{ display:flex; gap:8px; flex-shrink:0; }
   .btn{
     font-family:'Inter'; font-weight:600; font-size:13px; border-radius:10px; padding:9px 16px; cursor:pointer; border:none;
@@ -109,7 +109,7 @@
   .btn-ghost{ background:#fff; border:1px solid var(--line); color:var(--ink); }
   .btn-ghost:hover{ border-color:var(--purple); }
   .btn-danger{ background:#fff; border:1px solid #F0CFD6; color:var(--r1); }
-
+ 
   .term-tabs{ display:flex; gap:6px; margin-bottom:18px; background:var(--card); padding:5px; border-radius:14px; border:1px solid var(--line); width:fit-content;}
   .term-tab{
     font-family:'Baloo 2'; font-weight:600; font-size:13.5px; padding:8px 18px; border-radius:10px; cursor:pointer; color:var(--muted);
@@ -117,11 +117,11 @@
   }
   .term-tab.active{ background:var(--purple); color:white; }
   .term-tab .badge{ position:absolute; top:-4px; right:-4px; width:8px; height:8px; border-radius:50%; background:var(--green); border:1.5px solid white;}
-
+ 
   .legend{ display:flex; gap:14px; margin-bottom:14px; flex-wrap:wrap; }
   .legend span{ font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:5px; }
   .legend .lk{ width:10px;height:10px;border-radius:50%; display:inline-block;}
-
+ 
   .category{ margin-bottom:22px; background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; }
   .cat-head{ padding:13px 18px; font-family:'Baloo 2'; font-weight:700; font-size:15px; color:white; display:flex; align-items:center; gap:8px;}
   .cat-head svg{ width:18px;height:18px; flex-shrink:0;}
@@ -137,7 +137,7 @@
   .rating button.sel-1{ background:var(--r1); border-color:var(--r1); color:white; }
   .rating button.sel-2{ background:var(--r2); border-color:var(--r2); color:white; }
   .rating button.sel-3{ background:var(--r3); border-color:var(--r3); color:white; }
-
+ 
   .notes-section{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:18px; }
   .notes-section h4{ font-family:'Baloo 2'; margin:0 0 10px; font-size:15px; }
   .notes-section textarea{
@@ -149,18 +149,18 @@
   .sign-field label{ font-size:11px; color:var(--muted); font-weight:600; display:block; margin-bottom:4px;}
   .sign-field input{ width:100%; border:none; border-bottom:1.5px solid var(--line); padding:6px 2px; font-family:'Inter'; font-size:14px; background:transparent;}
   .sign-field input:focus{ outline:none; border-color:var(--purple); }
-
+ 
   .save-toast{
     position:fixed; bottom:24px; right:24px; background:var(--ink); color:white; padding:10px 18px; border-radius:10px;
     font-size:13px; font-weight:600; opacity:0; transform:translateY(10px); transition:all .25s; pointer-events:none;
     display:flex; align-items:center; gap:8px;
   }
   .save-toast.show{ opacity:1; transform:translateY(0); }
-
+ 
   .empty-main{ display:flex; flex-direction:column; align-items:center; justify-content:center; height:70vh; color:var(--muted); text-align:center; gap:14px;}
   .empty-main svg{ width:90px; height:90px; opacity:0.5;}
   .empty-main h2{ font-family:'Baloo 2'; color:var(--ink); margin:0; }
-
+ 
   .signin-screen{ display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; gap:18px; text-align:center; padding:20px; }
   .signin-screen svg{ width:110px; height:110px; }
   .signin-screen h1{ font-family:'Baloo 2'; font-size:28px; margin:0; }
@@ -177,7 +177,7 @@
   .drive-status .dot-busy{ width:7px; height:7px; border-radius:50%; background:var(--gold); flex-shrink:0; animation:pulse 1s infinite; }
   @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
   .btn-signout{ font-size:10.5px; color:var(--muted); text-decoration:underline; cursor:pointer; background:none; border:none; padding:0; font-family:'Inter'; }
-
+ 
   /* PDF export view (hidden, off-screen) */
   #pdf-root{ position:fixed; top:0; left:-9999px; width:780px; background:#fff; }
   .pdf-page{ width:780px; padding:40px 44px; background:#fff; position:relative; }
@@ -204,14 +204,14 @@
 </style>
 </head>
 <body>
-
+ 
 <div id="app" class="app"></div>
-
+ 
 <div class="save-toast" id="toast">✓ Saved</div>
-
+ 
 <!-- hidden PDF render target -->
 <div id="pdf-root"></div>
-
+ 
 <script>
 /* ===================== DATA MODEL ===================== */
 const CATEGORIES = [
@@ -249,10 +249,10 @@ const SCALE_LABELS = {1:"Needs Attention",2:"Satisfactory",3:"Excellent"};
 const TERMS = ["Term 1","Term 2","Term 3","Term 4"];
 const AGE_LABEL = "2 to 3 years";
 const STORAGE_PREFIX = "spacekidz-2-3yr";
-
+ 
 let state = { children: {}, activeChildId: null, activeTerm: 0, search: '' };
 let drive = { accessToken: null, fileId: null, folderId: null, folderName: null, tokenClient: null, ready: false, busy: false, pickerLoaded: false };
-
+ 
 // ===== Google Drive configuration =====
 // Fill these in once you have them from Google Cloud Console (see setup guide).
 const GOOGLE_CLIENT_ID = "784962094785-es8f4soa283b7cr9jjdulophksh0vp7p.apps.googleusercontent.com";
@@ -261,7 +261,7 @@ const GOOGLE_PROJECT_NUMBER = "784962094785"; // used as the Picker App ID
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive";
 const DATA_FILENAME = "roster.json";
 const FOLDER_MEMORY_KEY = STORAGE_PREFIX + ":chosenFolderId";
-
+ 
 /* ===================== GOOGLE DRIVE STORAGE ===================== */
 // This app stores its one data file (roster.json) inside a Drive folder the
 // educator picks themselves via the Google Picker — normally a folder the
@@ -269,11 +269,11 @@ const FOLDER_MEMORY_KEY = STORAGE_PREFIX + ":chosenFolderId";
 // see files it creates AND files the person explicitly selects through the
 // Picker — it cannot otherwise browse their Drive. The chosen folder's ID is
 // remembered in this browser so the picker only needs to be used once per device.
-
+ 
 function driveConfigured(){
   return GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith("YOUR_");
 }
-
+ 
 function initGoogleAuth(){
   return new Promise((resolve, reject) => {
     if(typeof google === 'undefined' || !google.accounts){
@@ -293,7 +293,7 @@ function initGoogleAuth(){
     resolve();
   });
 }
-
+ 
 function requestDriveAccess(){
   return new Promise((resolve, reject) => {
     drive.tokenClient.callback = (resp) => {
@@ -305,7 +305,7 @@ function requestDriveAccess(){
     drive.tokenClient.requestAccessToken({ prompt: '' });
   });
 }
-
+ 
 async function driveFetch(url, options={}){
   const headers = Object.assign({}, options.headers, { 'Authorization': 'Bearer ' + drive.accessToken });
   const res = await fetch(url, Object.assign({}, options, { headers }));
@@ -315,8 +315,8 @@ async function driveFetch(url, options={}){
   }
   return res;
 }
-
-
+ 
+ 
 function loadGapiPicker(){
   return new Promise((resolve, reject) => {
     if(drive.pickerLoaded){ resolve(); return; }
@@ -327,7 +327,7 @@ function loadGapiPicker(){
     gapi.load('picker', () => { drive.pickerLoaded = true; resolve(); });
   });
 }
-
+ 
 function openFolderPicker(){
   return new Promise(async (resolve, reject) => {
     try{ await loadGapiPicker(); }catch(e){ reject(e); return; }
@@ -353,7 +353,7 @@ function openFolderPicker(){
     picker.setVisible(true);
   });
 }
-
+ 
 function rememberFolder(folderId, folderName){
   try{ localStorage.setItem(FOLDER_MEMORY_KEY, JSON.stringify({ id: folderId, name: folderName })); }catch(e){}
 }
@@ -366,22 +366,20 @@ function recallFolder(){
     return raw ? JSON.parse(raw) : null;
   }catch(e){ return null; }
 }
-
-async function findOrCreateDataFile(folderId){
+ 
+async function listAllRosterFiles(folderId){
   const q = `name='${DATA_FILENAME}' and trashed=false and '${folderId}' in parents`;
-  const searchUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,size)&orderBy=quotaBytesUsed+desc`;
-  const res = await driveFetch(searchUrl);
+  const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,size,modifiedTime)&orderBy=quotaBytesUsed+desc`;
+  const res = await driveFetch(url);
   const data = await res.json();
-  // Pick the largest file — it has the most data (avoids picking an empty placeholder)
-  if(data.files && data.files.length > 0) return data.files[0].id;
-  return null;
+  return data.files || [];
 }
-
+ 
 async function driveDownloadFile(fileId){
   const res = await driveFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
   return res.json();
 }
-
+ 
 async function driveUploadFile(fileId, folderId, jsonData){
   const boundary = '-------spacekidz' + Date.now();
   const metadata = fileId ? {} : { name: DATA_FILENAME, parents: [folderId], mimeType: 'application/json' };
@@ -400,26 +398,65 @@ async function driveUploadFile(fileId, folderId, jsonData){
   const result = await res.json();
   return result.id;
 }
-
+ 
+function mergeRosters(fileDataArray){
+  const sorted = [...fileDataArray].sort((a,b) => a.modified.localeCompare(b.modified));
+  const merged = {};
+  for(const { data } of sorted){
+    for(const [id, child] of Object.entries(data)){
+      merged[id] = child;
+    }
+  }
+  return merged;
+}
+ 
 async function connectToDrive(folder){
   drive.folderId = folder.id;
   drive.folderName = folder.name;
   rememberFolder(folder.id, folder.name);
-  drive.fileId = await findOrCreateDataFile(drive.folderId);
-  if(drive.fileId){
-    state.children = await driveDownloadFile(drive.fileId);
-  } else {
+ 
+  const files = await listAllRosterFiles(drive.folderId);
+ 
+  if(files.length === 0){
     state.children = {};
+    drive.fileId = null;
+  } else if(files.length === 1){
+    drive.fileId = files[0].id;
+    try{ state.children = await driveDownloadFile(drive.fileId); }
+    catch(e){ state.children = {}; }
+  } else {
+    const fileDataArray = [];
+    for(const f of files){
+      try{
+        const data = await driveDownloadFile(f.id);
+        fileDataArray.push({ id: f.id, modified: f.modifiedTime, data });
+      }catch(e){ console.warn('Could not read file', f.id, e); }
+    }
+    const merged = mergeRosters(fileDataArray);
+    drive.fileId = files[0].id;
+    await driveUploadFile(drive.fileId, drive.folderId, merged);
+    state.children = merged;
+    console.log('Merged ' + files.length + ' roster files into one.');
   }
+ 
   drive.ready = true;
 }
-
+ 
 async function saveRoster(){
   drive.busy = true;
   renderDriveStatus();
   try{
-    const newFileId = await driveUploadFile(drive.fileId, drive.folderId, state.children);
-    drive.fileId = newFileId;
+    if(drive.fileId){
+      let driveData = {};
+      try{ driveData = await driveDownloadFile(drive.fileId); }
+      catch(e){ console.warn('Could not read before save', e); }
+      const merged = Object.assign({}, driveData, state.children);
+      state.children = merged;
+      await driveUploadFile(drive.fileId, drive.folderId, merged);
+    } else {
+      const newId = await driveUploadFile(null, drive.folderId, state.children);
+      drive.fileId = newId;
+    }
   }catch(e){
     console.error("Drive save failed", e);
     alert("Could not save to Google Drive. Check your connection and try again. Your changes are still on screen — please don't close this tab.");
@@ -428,7 +465,7 @@ async function saveRoster(){
   flashToast();
   renderDriveStatus();
 }
-
+ 
 function flashToast(){
   const t = document.getElementById('toast');
   if(!t) return;
@@ -436,7 +473,7 @@ function flashToast(){
   clearTimeout(window._toastTimer);
   window._toastTimer = setTimeout(()=>t.classList.remove('show'), 1400);
 }
-
+ 
 function renderDriveStatus(){
   const el = document.getElementById('driveStatus');
   if(!el) return;
@@ -444,17 +481,17 @@ function renderDriveStatus(){
     ? `<span class="dot-busy"></span> Saving to Drive…`
     : `<span class="dot-live"></span> Saved to Drive`;
 }
-
+ 
 function newChild(name){
   const id = 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
   const terms = TERMS.map(()=>({}));
   return { id, name, dob:"", educator:"", className:"", year:new Date().getFullYear().toString(),
     terms, notes:["","","",""], signedEducator:["","","",""], signedParent:["","","",""] };
 }
-
+ 
 function totalFields(){ return CATEGORIES.reduce((s,c)=>s+c.items.length,0); }
 function filledCount(termData){ return Object.keys(termData||{}).length; }
-
+ 
 /* ===================== RENDER ===================== */
 function svgRocket(idSuffix=""){
   return `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -466,12 +503,12 @@ function svgRocket(idSuffix=""){
     <path d="M24 46C24 46 26 56 32 60C38 56 40 46 40 46" fill="#F5A623" opacity="0.85"/>
   </svg>`;
 }
-
+ 
 function render(){
   const app = document.getElementById('app');
   const childArr = Object.values(state.children).sort((a,b)=>a.name.localeCompare(b.name));
   const active = state.activeChildId ? state.children[state.activeChildId] : null;
-
+ 
   app.innerHTML = `
     <div class="sidebar">
       <div class="brand">
@@ -522,7 +559,7 @@ function render(){
         </div>
       </div>
     </div>
-
+ 
     <div class="main">
       ${!active ? `
         <div class="empty-main">
@@ -533,15 +570,15 @@ function render(){
       ` : renderMain(active)}
     </div>
   `;
-
+ 
   attachEvents();
   renderDriveStatus();
 }
-
+ 
 function renderMain(c){
   const termIdx = state.activeTerm;
   const termData = c.terms[termIdx] || {};
-
+ 
   return `
     <div class="topbar">
       <div>
@@ -560,18 +597,18 @@ function renderMain(c){
         <button class="btn btn-danger" id="btnDelete">Remove</button>
       </div>
     </div>
-
+ 
     <div class="term-tabs">
       ${TERMS.map((t,i)=>{
         const f = filledCount(c.terms[i]); const tot = totalFields();
         return `<div class="term-tab ${i===termIdx?'active':''}" data-term="${i}">${t}${f>0&&f<tot?'<span class="badge" style="background:#F5A623"></span>':(f>=tot?'<span class="badge"></span>':'')}</div>`;
       }).join('')}
     </div>
-
+ 
     <div class="legend">
       ${SCALE.map(s => `<span><span class="lk" style="background:var(--r${s})"></span>${s} = ${SCALE_LABELS[s]}</span>`).join('')}
     </div>
-
+ 
     ${CATEGORIES.map((cat, ci) => `
       <div class="category">
         <div class="cat-head" style="background:${cat.color}">${cat.name}</div>
@@ -588,7 +625,7 @@ function renderMain(c){
         }).join('')}
       </div>
     `).join('')}
-
+ 
     <div class="notes-section">
       <h4>General Observation from Educator — ${TERMS[termIdx]}</h4>
       <textarea id="notesArea" placeholder="Write your observations for this term...">${escapeHtml(c.notes[termIdx]||'')}</textarea>
@@ -599,12 +636,12 @@ function renderMain(c){
     </div>
   `;
 }
-
+ 
 function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
-
+ 
 /* ===================== EVENTS ===================== */
-
+ 
 function filterRoster(val){
   state.search = val;
   render();
@@ -624,15 +661,15 @@ function attachEvents(){
     await saveRoster();
     render();
   };
-
+ 
   document.querySelectorAll('.child-card').forEach(el => {
     el.onclick = () => { state.activeChildId = el.dataset.id; state.activeTerm = 0; render(); };
   });
-
+ 
   document.querySelectorAll('.term-tab').forEach(el => {
     el.onclick = () => { state.activeTerm = parseInt(el.dataset.term); render(); };
   });
-
+ 
   document.querySelectorAll('.rating').forEach(el => {
     el.querySelectorAll('button').forEach(btn => {
       btn.onclick = async () => {
@@ -648,7 +685,7 @@ function attachEvents(){
       };
     });
   });
-
+ 
   document.querySelectorAll('[data-field]').forEach(el => {
     el.onchange = async () => {
       const c = state.children[state.activeChildId];
@@ -657,7 +694,7 @@ function attachEvents(){
       render();
     };
   });
-
+ 
   const notesArea = document.getElementById('notesArea');
   if(notesArea) notesArea.onblur = async () => {
     state.children[state.activeChildId].notes[state.activeTerm] = notesArea.value;
@@ -667,7 +704,7 @@ function attachEvents(){
   if(se) se.onblur = async () => { state.children[state.activeChildId].signedEducator[state.activeTerm] = se.value; await saveRoster(); };
   const sp = document.getElementById('signParent');
   if(sp) sp.onblur = async () => { state.children[state.activeChildId].signedParent[state.activeTerm] = sp.value; await saveRoster(); };
-
+ 
   const delBtn = document.getElementById('btnDelete');
   if(delBtn) delBtn.onclick = async () => {
     const c = state.children[state.activeChildId];
@@ -677,10 +714,10 @@ function attachEvents(){
     await saveRoster();
     render();
   };
-
+ 
   const exportBtn = document.getElementById('btnExport');
   if(exportBtn) exportBtn.onclick = () => exportPdf(state.children[state.activeChildId]);
-
+ 
   const backupExportBtn = document.getElementById('btnBackupExport');
   if(backupExportBtn) backupExportBtn.onclick = () => {
     const blob = new Blob([JSON.stringify(state.children, null, 2)], {type:'application/json'});
@@ -690,7 +727,7 @@ function attachEvents(){
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-
+ 
   const backupImportBtn = document.getElementById('btnBackupImport');
   const fileImport = document.getElementById('fileImport');
   if(backupImportBtn) backupImportBtn.onclick = () => fileImport.click();
@@ -714,8 +751,8 @@ function attachEvents(){
     reader.readAsText(file);
     fileImport.value = '';
   };
-
-
+ 
+ 
   const exportAllBtn = document.getElementById('btnExportAll');
   if(exportAllBtn) exportAllBtn.onclick = async () => {
     const children = Object.values(state.children).sort((a,b)=>a.name.localeCompare(b.name));
@@ -737,7 +774,7 @@ function attachEvents(){
     forgetFolder();
     renderChooseFolder();
   };
-
+ 
   const signOutBtn = document.getElementById('btnSignOut');
   if(signOutBtn) signOutBtn.onclick = () => {
     if(drive.accessToken){ google.accounts.oauth2.revoke(drive.accessToken, () => {}); }
@@ -747,13 +784,13 @@ function attachEvents(){
     renderSignIn();
   };
 }
-
+ 
 /* ===================== PDF EXPORT ===================== */
 async function exportPdf(c){
   const root = document.getElementById('pdf-root');
   root.innerHTML = '';
   const pages = [];
-
+ 
   // Cover page
   pages.push(`
     <div class="pdf-page">
@@ -779,7 +816,7 @@ async function exportPdf(c){
       <div class="pdf-foot">Cathkin Academy &amp; SpaceKidz &middot; Ravenswood, Boksburg, Gauteng</div>
     </div>
   `);
-
+ 
   // One page per term with full table + notes
   TERMS.forEach((termName, ti) => {
     const termData = c.terms[ti] || {};
@@ -807,9 +844,9 @@ async function exportPdf(c){
     </div>`;
     pages.push(body);
   });
-
+ 
   root.innerHTML = pages.join('');
-
+ 
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF('p','pt','a4');
   const pageEls = root.querySelectorAll('.pdf-page');
@@ -826,7 +863,7 @@ async function exportPdf(c){
   pdf.save(`${(c.name||'report').replace(/\s+/g,'_')}_SpaceKidz_Progress_Report.pdf`);
   root.innerHTML = '';
 }
-
+ 
 /* ===================== SIGN-IN SCREEN ===================== */
 function renderConfigMissing(){
   document.getElementById('app').innerHTML = `
@@ -837,7 +874,7 @@ function renderConfigMissing(){
     </div>
   `;
 }
-
+ 
 function renderSignIn(errorMsg){
   document.getElementById('app').innerHTML = `
     <div class="signin-screen">
@@ -863,7 +900,7 @@ function renderSignIn(errorMsg){
     }
   };
 }
-
+ 
 async function proceedAfterSignIn(){
   const remembered = recallFolder();
   if(remembered){
@@ -878,7 +915,7 @@ async function proceedAfterSignIn(){
   }
   renderChooseFolder();
 }
-
+ 
 function renderChooseFolder(errorMsg){
   document.getElementById('app').innerHTML = `
     <div class="signin-screen">
@@ -909,17 +946,17 @@ function renderChooseFolder(errorMsg){
     }
   };
 }
-
+ 
 function finishLoadingIntoApp(){
   const ids = Object.keys(state.children);
   if(ids.length) state.activeChildId = ids.sort((a,b)=>state.children[a].name.localeCompare(state.children[b].name))[0];
   render();
 }
-
+ 
 function svgFolderIcon(){
   return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6.5C3 5.67 3.67 5 4.5 5h4.46c.4 0 .78.16 1.06.44l1.5 1.5c.28.28.66.44 1.06.44H19.5c.83 0 1.5.67 1.5 1.5v9c0 .83-.67 1.5-1.5 1.5h-15A1.5 1.5 0 013 17.94V6.5z" stroke="#F5A623" stroke-width="1.6"/></svg>`;
 }
-
+ 
 /* ===================== INIT ===================== */
 (async function init(){
   if(!driveConfigured()){ renderConfigMissing(); return; }
