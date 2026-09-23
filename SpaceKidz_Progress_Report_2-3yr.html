@@ -90,6 +90,24 @@
   .main{ flex:1; padding:24px 32px 60px; max-width:980px; }
   .topbar{ display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:18px; flex-wrap:wrap;}
   .child-title{ font-family:'Baloo 2'; font-weight:700; font-size:26px; }
+  .name-edit-row{ display:flex; align-items:center; gap:8px; }
+  .name-input{
+    font-family:'Baloo 2'; font-weight:700; font-size:26px;
+    border:none; border-bottom:2px solid transparent;
+    background:transparent; color:var(--ink); outline:none;
+    width:auto; min-width:200px; max-width:480px;
+    transition:border-color 0.2s;
+    padding:0; line-height:1.2;
+  }
+  .name-input:hover{ border-bottom-color:var(--line); }
+  .name-input:focus{ border-bottom-color:var(--purple); }
+  .name-edit-btn{
+    background:none; border:none; cursor:pointer; padding:2px 4px;
+    color:var(--muted); font-size:15px; line-height:1;
+    border-radius:4px; transition:color 0.15s,background 0.15s;
+    flex-shrink:0;
+  }
+  .name-edit-btn:hover{ color:var(--purple); background:rgba(123,63,160,.08); }
   .child-sub{ color:var(--muted); font-size:13px; margin-top:2px; }
   .field-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
   .field-row input{
@@ -582,7 +600,10 @@ function renderMain(c){
   return `
     <div class="topbar">
       <div>
-        <div class="child-title">${escapeHtml(c.name)||'Unnamed Learner'}</div>
+        <div class="name-edit-row">
+          <input class="name-input" id="childNameInput" value="${escapeAttr(c.name)}" placeholder="Learner name" title="Click to edit name">
+          <button class="name-edit-btn" onclick="document.getElementById('childNameInput').focus()" title="Edit name">✏️</button>
+        </div>
         <div class="child-sub">Progress Report &middot; ${AGE_LABEL}</div>
         <div class="field-row">
           <div class="field-group"><label>Date of Birth</label><input type="date" data-field="dob" value="${c.dob}"></div>
@@ -695,6 +716,17 @@ function attachEvents(){
     };
   });
  
+  const nameInput = document.getElementById('childNameInput');
+  if(nameInput){
+    nameInput.onblur = async () => {
+      const val = nameInput.value.trim();
+      if(!val) return;
+      state.children[state.activeChildId].name = val;
+      await saveRoster();
+      render();
+    };
+    nameInput.onkeydown = (e) => { if(e.key==='Enter'){ nameInput.blur(); } };
+  }
   const notesArea = document.getElementById('notesArea');
   if(notesArea) notesArea.onblur = async () => {
     state.children[state.activeChildId].notes[state.activeTerm] = notesArea.value;
