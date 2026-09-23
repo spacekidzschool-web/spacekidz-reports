@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpaceKidz Progress Reports</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#7B3FA0;--cyan:#3FBFCF;--green:#7CB342;--orange:#F5A623;--pink:#E85D9C;
+    --bg:#F8F0FC;--card:#fff;--text:#2d2d2d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Baloo 2',sans-serif;background:var(--bg);min-height:100vh;padding:32px 16px}
+  .header{text-align:center;margin-bottom:36px}
+  .logo{display:inline-flex;align-items:center;gap:12px;margin-bottom:8px}
+  .wordmark{font-size:32px;font-weight:800;letter-spacing:1px}
+  .wordmark span:nth-child(1){color:#7B3FA0}
+  .wordmark span:nth-child(2){color:#3FBFCF}
+  .wordmark span:nth-child(3){color:#7CB342}
+  .wordmark span:nth-child(4){color:#F5A623}
+  .wordmark span:nth-child(5){color:#E85D9C}
+  .wordmark span:nth-child(6){color:#7B3FA0}
+  .wordmark span:nth-child(7){color:#3FBFCF}
+  .wordmark span:nth-child(8){color:#7CB342}
+  .wordmark span:nth-child(9){color:#F5A623}
+  .tagline{color:var(--cyan);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+  .subtitle{color:#888;font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:900px;margin:0 auto}
+  .card{background:var(--card);border-radius:20px;padding:28px 24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);text-decoration:none;color:var(--text);transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column;gap:10px;border-top:5px solid var(--purple)}
+  .card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,0.13)}
+  .card-icon{font-size:32px}
+  .card-title{font-size:18px;font-weight:800;color:var(--purple)}
+  .card-ages{font-size:13px;color:var(--cyan);font-weight:700;letter-spacing:.5px}
+  .card-desc{font-size:12.5px;color:#888;line-height:1.5}
+  .footer{text-align:center;margin-top:44px;font-size:12px;color:#bbb}
+  .card:nth-child(1){border-top-color:#E85D9C}
+  .card:nth-child(2){border-top-color:#3FBFCF}
+  .card:nth-child(3){border-top-color:#7CB342}
+  .card:nth-child(4){border-top-color:#F5A623}
+  .card:nth-child(5){border-top-color:#7B3FA0}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo">
+    <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="48" fill="#F1E6F6"/>
+      <ellipse cx="50" cy="54" rx="16" ry="28" fill="#7B3FA0"/>
+      <ellipse cx="50" cy="54" rx="10" ry="20" fill="#3FBFCF"/>
+      <polygon points="50,14 56,30 44,30" fill="#F5A623"/>
+      <circle cx="35" cy="60" r="8" fill="#E85D9C" opacity=".8"/>
+      <circle cx="65" cy="60" r="8" fill="#7CB342" opacity=".8"/>
+      <circle cx="50" cy="80" r="6" fill="#F5A623" opacity=".7"/>
+    </svg>
+    <div>
+      <div class="wordmark"><span>S</span><span>P</span><span>A</span><span>C</span><span>E</span><span>K</span><span>I</span><span>D</span><span>Z</span></div>
+      <div class="tagline">Selective Play and Child Education</div>
+    </div>
+  </div>
+  <div class="subtitle">Learner Progress Reports — select your class below</div>
+</div>
+
+<div class="grid">
+  <a class="card" href="SpaceKidz_Progress_Report_6mo-2yr.html">
+    <div class="card-icon">🍼</div>
+    <div class="card-title">Babies &amp; Toddlers</div>
+    <div class="card-ages">6 Months – 2 Years</div>
+    <div class="card-desc">Physical, sensory, social and early language development for our youngest learners.</div>
+  </a>
+  <a class="card" href="SpaceKidz_Progress_Report_2-3yr.html">
+    <div class="card-icon">🧸</div>
+    <div class="card-title">Toddlers</div>
+    <div class="card-ages">2 – 3 Years</div>
+    <div class="card-desc">Emerging independence, play-based learning, and foundational social skills.</div>
+  </a>
+  <a class="card" href="SpaceKidz_Progress_Report_GradeRRR.html">
+    <div class="card-icon">🎨</div>
+    <div class="card-title">Grade RRR</div>
+    <div class="card-ages">3 – 4 Years</div>
+    <div class="card-desc">Pre-school readiness — motor skills, language, early numeracy and creativity.</div>
+  </a>
+  <a class="card" href="SpaceKidz_Progress_Report_GradeRR.html">
+    <div class="card-icon">✏️</div>
+    <div class="card-title">Grade RR</div>
+    <div class="card-ages">4 – 5 Years</div>
+    <div class="card-desc">School readiness — literacy foundations, cognitive development and emotional growth.</div>
+  </a>
+  <a class="card" href="SpaceKidz_Progress_Report_GradeR.html">
+    <div class="card-icon">🚀</div>
+    <div class="card-title">Grade R</div>
+    <div class="card-ages">5 – 6 Years</div>
+    <div class="card-desc">Language, Mathematics and Life Skills — term-by-term CAPS-aligned progress tracking.</div>
+  </a>
+</div>
+
+<div class="footer">Cathkin Academy &amp; SpaceKidz · Ravenswood, Boksburg, Gauteng</div>
+</body>
+</html>

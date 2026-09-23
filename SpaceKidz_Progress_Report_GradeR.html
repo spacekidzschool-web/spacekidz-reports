@@ -904,11 +904,12 @@ async function exportPdf(c){
     const termData = c.terms[ti] || {};
     const term = TERM_DATA[ti];
     let rowCounter = 0;
-    let body = `<div class="pdf-page">
-      <div class="pdf-term">${termName} — ${escapeHtml(c.name)}</div>`;
- 
-    SUBJECT_ORDER.forEach(subj => {
-      body += `<div class="pdf-subject" style="background:${SUBJECT_COLORS[subj]}">${subj}</div>`;
+    const subjects = SUBJECT_ORDER.filter(s => term[s] && term[s].length > 0);
+    subjects.forEach((subj, si) => {
+      const isLastSubj = si === subjects.length - 1;
+      let body = `<div class="pdf-page">
+        <div class="pdf-term">${termName} — ${escapeHtml(c.name)}</div>
+        <div class="pdf-subject" style="background:${SUBJECT_COLORS[subj]}">${subj}</div>`;
       (term[subj]||[]).forEach(pair => {
         const subcatName = pair[0], items = pair[1];
         body += `<div class="pdf-subcat">${escapeHtml(subcatName)}</div><table class="pdf-table">`;
@@ -919,21 +920,33 @@ async function exportPdf(c){
         });
         body += `</table>`;
       });
+      if(isLastSubj){
+        body += `
+          <div class="pdf-notes">
+            <b>Days absent:</b> ${escapeHtml(c.daysAbsent[ti]||'0')}<br><br>
+            <b>General observations from educator:</b><br>${escapeHtml(c.obsEducator[ti]||'').replace(/
+/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}<br><br>
+            <b>Comments from parents:</b><br>${escapeHtml(c.obsParent[ti]||'').replace(/
+/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}
+          </div>
+          <div class="pdf-sign">
+            <div>Parent Signature — ${escapeHtml(c.signedParent[ti]||'________________')}</div>
+            <div>Educator Signature — ${escapeHtml(c.signedEducator[ti]||'________________')}<br><span style="font-size:9.5px;color:#888">${escapeHtml(c.sace[ti]||'')}</span></div>
+          </div>`;
+      }
+      body += `
+        <div class="pdf-foot">SpaceKidz Progress Report &middot; ${AGE_LABEL} &middot; ${termName}</div>
+      </div>`;
+      pages.push(body);
     });
- 
-    body += `
-      <div class="pdf-notes">
-        <b>Days absent:</b> ${escapeHtml(c.daysAbsent[ti]||'0')}<br><br>
-        <b>General observations from educator:</b><br>${escapeHtml(c.obsEducator[ti]||'').replace(/\n/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}<br><br>
-        <b>Comments from parents:</b><br>${escapeHtml(c.obsParent[ti]||'').replace(/\n/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}
-      </div>
-      <div class="pdf-sign">
-        <div>Parent Signature — ${escapeHtml(c.signedParent[ti]||'________________')}</div>
-        <div>Educator Signature — ${escapeHtml(c.signedEducator[ti]||'________________')}<br><span style="font-size:9.5px;color:#888">${escapeHtml(c.sace[ti]||'')}</span></div>
-      </div>
-      <div class="pdf-foot">SpaceKidz Progress Report &middot; ${AGE_LABEL} &middot; Page ${ti+2}</div>
-    </div>`;
-    pages.push(body);
+    // fallback if term has no subjects yet
+    if(subjects.length === 0){
+      pages.push(`<div class="pdf-page">
+        <div class="pdf-term">${termName} — ${escapeHtml(c.name)}</div>
+        <p style="color:#bbb;text-align:center;margin-top:40px;">No scores recorded for this term.</p>
+        <div class="pdf-foot">SpaceKidz Progress Report &middot; ${AGE_LABEL} &middot; ${termName}</div>
+      </div>`);
+    }
   });
  
   root.innerHTML = pages.join('');

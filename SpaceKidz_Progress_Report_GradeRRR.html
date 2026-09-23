@@ -829,29 +829,39 @@ async function exportPdf(c){
   // One page per term with full table + notes
   TERMS.forEach((termName, ti) => {
     const termData = c.terms[ti] || {};
-    let body = `<div class="pdf-page">
-      <div class="pdf-term">${termName} — ${escapeHtml(c.name)}</div>`;
-    CATEGORIES.forEach((cat, ci) => {
-      body += `<div class="pdf-cat" style="background:${cat.color}">${cat.name}</div>
-        <table class="pdf-table">`;
-      cat.items.forEach((item, ii) => {
-        const key = `${ci}_${ii}`;
-        const val = termData[key];
-        body += `<tr><td class="lbl">${item}</td><td class="val">${val ? val + ' — ' + SCALE_LABELS[val] : '—'}</td></tr>`;
+    const CATS_PER_PAGE = 4;
+    for(let chunk=0; chunk*CATS_PER_PAGE < CATEGORIES.length; chunk++){
+      const slice = CATEGORIES.slice(chunk*CATS_PER_PAGE, (chunk+1)*CATS_PER_PAGE);
+      const isLast = (chunk+1)*CATS_PER_PAGE >= CATEGORIES.length;
+      let body = `<div class="pdf-page">
+        <div class="pdf-term">${termName} — ${escapeHtml(c.name)}</div>`;
+      slice.forEach((cat, sliceIdx) => {
+        const ci = chunk*CATS_PER_PAGE + sliceIdx;
+        body += `<div class="pdf-cat" style="background:${cat.color}">${cat.name}</div>
+          <table class="pdf-table">`;
+        cat.items.forEach((item, ii) => {
+          const key = `${ci}_${ii}`;
+          const val = termData[key];
+          body += `<tr><td class="lbl">${item}</td><td class="val">${val ? val + ' — ' + SCALE_LABELS[val] : '—'}</td></tr>`;
+        });
+        body += `</table>`;
       });
-      body += `</table>`;
-    });
-    body += `
-      <div class="pdf-notes">
-        <b>General Observation from Educator:</b><br>${escapeHtml(c.notes[ti]||'').replace(/\n/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}
-      </div>
-      <div class="pdf-sign">
-        <div>Signed: Educator — ${escapeHtml(c.signedEducator[ti]||'________________')}</div>
-        <div>Signed: Parent — ${escapeHtml(c.signedParent[ti]||'________________')}</div>
-      </div>
-      <div class="pdf-foot">SpaceKidz Progress Report &middot; ${AGE_LABEL} &middot; Page ${ti+2}</div>
-    </div>`;
-    pages.push(body);
+      if(isLast){
+        body += `
+          <div class="pdf-notes">
+            <b>General Observation from Educator:</b><br>${escapeHtml(c.notes[ti]||'').replace(/
+/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}
+          </div>
+          <div class="pdf-sign">
+            <div>Signed: Educator — ${escapeHtml(c.signedEducator[ti]||'________________')}</div>
+            <div>Signed: Parent — ${escapeHtml(c.signedParent[ti]||'________________')}</div>
+          </div>`;
+      }
+      body += `
+        <div class="pdf-foot">SpaceKidz Progress Report &middot; ${AGE_LABEL} &middot; ${termName}</div>
+      </div>`;
+      pages.push(body);
+    }
   });
  
   root.innerHTML = pages.join('');
