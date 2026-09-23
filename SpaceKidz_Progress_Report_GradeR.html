@@ -924,10 +924,8 @@ async function exportPdf(c){
         body += `
           <div class="pdf-notes">
             <b>Days absent:</b> ${escapeHtml(c.daysAbsent[ti]||'0')}<br><br>
-            <b>General observations from educator:</b><br>${escapeHtml(c.obsEducator[ti]||'').replace(/
-/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}<br><br>
-            <b>Comments from parents:</b><br>${escapeHtml(c.obsParent[ti]||'').replace(/
-/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}
+            <b>General observations from educator:</b><br>${escapeHtml(c.obsEducator[ti]||'').replace(/\n/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}<br><br>
+            <b>Comments from parents:</b><br>${escapeHtml(c.obsParent[ti]||'').replace(/\n/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}
           </div>
           <div class="pdf-sign">
             <div>Parent Signature — ${escapeHtml(c.signedParent[ti]||'________________')}</div>

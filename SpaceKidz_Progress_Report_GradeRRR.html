@@ -849,8 +849,7 @@ async function exportPdf(c){
       if(isLast){
         body += `
           <div class="pdf-notes">
-            <b>General Observation from Educator:</b><br>${escapeHtml(c.notes[ti]||'').replace(/
-/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}
+            <b>General Observation from Educator:</b><br>${escapeHtml(c.notes[ti]||'').replace(/\n/g,'<br>') || '<i style="color:#bbb">No comments recorded.</i>'}
           </div>
           <div class="pdf-sign">
             <div>Signed: Educator — ${escapeHtml(c.signedEducator[ti]||'________________')}</div>
